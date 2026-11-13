@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#315b45">
+  <title>Repas familiaux</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">ORGANISATION FAMILIALE</p>
+      <h1>Gestion des repas</h1>
+    </div>
+    <span class="local-badge">Enregistrement sur cet appareil</span>
+  </header>
+
+  <nav class="tabs" aria-label="Navigation principale">
+    <button class="tab active" data-view="dashboard">Tableau de bord</button>
+    <button class="tab" data-view="catalogue">Catalogue</button>
+    <button class="tab" data-view="compatibilites">Compatibilités</button>
+    <button class="tab" data-view="planning">Planning</button>
+    <button class="tab" data-view="today">Repas du jour</button>
+    <button class="tab" data-view="settings">Paramètres</button>
+  </nav>
+
+  <main>
+    <section id="dashboard" class="view active">
+      <div class="section-heading">
+        <div><p class="eyebrow">VUE GÉNÉRALE</p><h2>Tableau de bord</h2></div>
+        <span id="today-date" class="muted"></span>
+      </div>
+      <div class="dashboard-grid">
+        <article class="panel">
+          <h3>Repas générés</h3>
+          <div id="dashboard-meals" class="meal-pair"></div>
+          <p id="dashboard-empty" class="muted">Aucun repas du jour n’a encore été validé.</p>
+        </article>
+        <article class="panel">
+          <h3>Catalogue</h3>
+          <div class="catalog-counts">
+            <div><strong id="dish-count">0</strong><span>Plats</span></div>
+            <div><strong id="side-count">0</strong><span>Accompagnements</span></div>
+          </div>
+        </article>
+        <article class="panel">
+          <h3>Combinaisons possibles</h3>
+          <strong class="big-number" id="combo-count">0</strong>
+          <p class="muted">Associations autorisées enregistrées.</p>
+        </article>
+      </div>
+      <div class="panel">
+        <div class="section-heading compact"><h3>Prochaines actions</h3></div>
+        <div class="quick-actions">
+          <button class="primary" data-go="today">Créer les repas de ce jour</button>
+          <button class="secondary" data-go="planning">Générer le planning sur 14 jours</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="catalogue" class="view">
+      <div class="section-heading"><div><p class="eyebrow">BASE DE REPAS</p><h2>Catalogue</h2></div></div>
+      <div class="two-columns">
+        <article class="panel">
+          <h3>Plats principaux</h3>
+          <form id="dish-form" class="inline-form">
+            <input id="dish-name" required maxlength="80" placeholder="Nom du plat">
+            <button class="primary" type="submit">Ajouter</button>
+          </form>
+          <ul id="dish-list" class="editable-list"></ul>
+        </article>
+        <article class="panel">
+          <h3>Accompagnements</h3>
+          <form id="side-form" class="inline-form">
+            <input id="side-name" required maxlength="80" placeholder="Nom de l’accompagnement">
+            <button class="primary" type="submit">Ajouter</button>
+          </form>
+          <ul id="side-list" class="editable-list"></ul>
+        </article>
+      </div>
+      <p class="notice">Les modifications du catalogue sont enregistrées automatiquement sur cet appareil.</p>
+    </section>
+
+    <section id="compatibilites" class="view">
+      <div class="section-heading"><div><p class="eyebrow">ASSOCIATIONS AUTORISÉES</p><h2>Compatibilités</h2></div></div>
+      <div class="panel">
+        <p>Choisissez les accompagnements autorisés pour chaque plat. Aucune compatibilité n’est présélectionnée : les associations doivent être renseignées selon vos règles.</p>
+        <div id="compatibility-editor"></div>
+        <div class="actions"><button id="save-compat" class="primary">Enregistrer les compatibilités</button></div>
+      </div>
+    </section>
+
+    <section id="planning" class="view">
+      <div class="section-heading"><div><p class="eyebrow">DEUX SEMAINES</p><h2>Planning sur 14 jours</h2></div></div>
+      <div class="panel">
+        <p>Le planning comprend un déjeuner et un dîner par jour. Les associations non autorisées ne seront jamais proposées.</p>
+        <button id="generate-plan" class="primary">Générer le planning</button>
+        <p id="planning-message" class="notice" aria-live="polite"></p>
+        <div id="planning-result" class="planning-grid"></div>
+        <div id="planning-actions" class="actions hidden">
+          <button id="save-plan" class="primary">Valider et enregistrer les 14 jours</button>
+          <button id="print-plan" class="secondary">Imprimer</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="today" class="view">
+      <div class="section-heading"><div><p class="eyebrow">PROPOSITION QUOTIDIENNE</p><h2>Créer les repas de ce jour</h2></div></div>
+      <div class="panel">
+        <p>Renseignez les repas consommés hier, avant-hier et il y a trois jours. Cela représente exactement six repas. Les données déjà présentes dans l’historique sont préremplies.</p>
+        <div id="recent-meals" class="recent-grid"></div>
+        <div class="actions">
+          <button id="generate-today" class="primary">Proposer les repas du jour</button>
+        </div>
+        <p id="today-message" class="notice" aria-live="polite"></p>
+      </div>
+      <div id="today-result" class="panel hidden">
+        <h3>Proposition de repas pour aujourd’hui</h3>
+        <div class="two-columns">
+          <div class="meal-card">
+            <div class="meal-title"><h4>Déjeuner</h4><button class="text-button" id="renew-lunch">Nouvelle proposition</button></div>
+            <div id="lunch-proposal"></div>
+            <button class="secondary edit-meal" data-meal="lunch">Modifier</button>
+          </div>
+          <div class="meal-card">
+            <div class="meal-title"><h4>Dîner</h4><button class="text-button" id="renew-dinner">Nouvelle proposition</button></div>
+            <div id="dinner-proposal"></div>
+            <button class="secondary edit-meal" data-meal="dinner">Modifier</button>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="validate-today" class="primary">Valider et enregistrer les repas du jour</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="settings" class="view">
+      <div class="section-heading"><div><p class="eyebrow">DONNÉES DE L’APPLICATION</p><h2>Paramètres</h2></div></div>
+      <div class="panel">
+        <h3>Gestion des données</h3>
+        <p>Les données sont conservées dans le stockage local du navigateur utilisé. Elles ne sont pas envoyées sur un serveur.</p>
+        <div class="actions">
+          <button id="export-data" class="secondary">Exporter une sauvegarde</button>
+          <label class="file-button secondary">Importer une sauvegarde<input id="import-data" type="file" accept="application/json"></label>
+        </div>
+        <p class="muted small">Pensez à exporter régulièrement une sauvegarde si vous changez d’appareil ou de navigateur.</p>
+      </div>
+      <div class="panel danger-zone">
+        <h3>Réinitialisation</h3>
+        <p>Supprimer toutes les données enregistrées dans cette application sur cet appareil.</p>
+        <button id="reset-data" class="danger">Réinitialiser les données</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>Gestion des repas familiaux · Application locale</footer>
+  <dialog id="edit-dialog">
+    <form method="dialog" id="edit-form">
+      <h3 id="edit-title">Modifier le repas</h3>
+      <label>Plat principal<select id="edit-dish" required></select></label>
+      <label>Accompagnement<select id="edit-side" required></select></label>
+      <div class="actions">
+        <button class="secondary" value="cancel">Annuler</button>
+        <button class="primary" id="apply-edit" value="save">Appliquer</button>
+      </div>
+    </form>
+  </dialog>
+  <script src="script.js"></script>
+</body>
+</html>
